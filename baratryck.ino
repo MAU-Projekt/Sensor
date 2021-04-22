@@ -34,7 +34,7 @@ void loop()
   char buf[100];
   float humidity = 14.5;
   float temperature = 44.6;
-  int content_length = sprintf(buf, "{"temperature":"%f","humidity":"%f"}", temperature, humidity);
+  int content_length = sprintf(buf, "{\"temperature\":\"%f\",\"humidity\":\"%f\"}", temperature, humidity);
   
   
   EthernetClient c;
