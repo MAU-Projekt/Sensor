@@ -1,4 +1,3 @@
-
 #include <SPI.h>
 #include <HttpClient.h>
 #include <Ethernet.h>
@@ -33,22 +32,22 @@ void loop()
   
   EthernetClient c;
   HttpClient http(c);
-  
+  http.beginRequest();
   err = http.post(kHostname, kPath);
+  http.sendHeader("Content-Length", 20);
   http.write((const uint8_t *) "{\"temperature\":\"15\"}", 20);
+  http.flush();
+  http.endRequest();
+  
   if (err == 0)
   {
     Serial.println("startedRequest ok");
-
+   
     err = http.responseStatusCode();
     if (err >= 0)
     {
       Serial.print("Got status code: ");
       Serial.println(err);
-
-      // Usually you'd check that the response code is 200 or a
-      // similar "success" code (200-299) before carrying on,
-      // but we'll print out whatever response we get
 
       err = http.skipResponseHeaders();
       if (err >= 0)
@@ -101,6 +100,7 @@ void loop()
     Serial.print("Connect failed: ");
     Serial.println(err);
   }
+
   http.stop();
 
   // And just stop, now that we've tried a download
