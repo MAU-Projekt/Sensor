@@ -6,7 +6,7 @@
 
 
 const char kHostname[] = "84.217.9.249";
-const char kPath[] = "/";
+const char kPath[] = "/sensor/ar/now";
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
@@ -34,7 +34,8 @@ void loop()
   EthernetClient c;
   HttpClient http(c);
   
-  err = http.get(kHostname, kPath);
+  err = http.post(kHostname, kPath);
+  http.write((const uint8_t *) "{\"temperature\":\"15\"}", 20);
   if (err == 0)
   {
     Serial.println("startedRequest ok");
