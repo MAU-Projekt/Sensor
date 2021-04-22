@@ -2,7 +2,12 @@
 #include <HttpClient.h>
 #include <Ethernet.h>
 #include <EthernetClient.h>
+#include <dht.h>
 
+dht DHT;
+
+#define DHT11_PIN 7
+  int ledpin = 11;
 
 const char kHostname[] = "84.217.9.249";
 const char kPath[] = "/sensor/ar/now";
@@ -18,6 +23,7 @@ void setup()
 {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600); 
+  pinMode(ledpin, OUTPUT);
 
   while (Ethernet.begin(mac) != 1)
   {
@@ -29,12 +35,16 @@ void setup()
 void loop()
 {
   int err =0;
-  
+  int chk = DHT.read11(DHT11_PIN);
+  int val;
   
   char buf[100];
-  int humidity = 14;
-  int temperature = 44;
+  int humidity = DHT.temperature;
+  int temperature = DHT.humidity;
   int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\"}", temperature, humidity);
+
+
+ 
   
   
   EthernetClient c;
@@ -45,7 +55,7 @@ void loop()
   http.write((const uint8_t *) buf, content_length);
   http.flush();
   http.endRequest();
-  
+    delay(2000);
   if (err == 0)
   {
     Serial.println("startedRequest ok");
