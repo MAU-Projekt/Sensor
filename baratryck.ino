@@ -30,12 +30,19 @@ void loop()
 {
   int err =0;
   
+  
+  char buf[100];
+  float humidity = 14.5;
+  float temperature = 44.6;
+  int content_length = sprintf(buf, "{"temperature":"%f","humidity":"%f"}", temperature, humidity);
+  
+  
   EthernetClient c;
   HttpClient http(c);
   http.beginRequest();
   err = http.post(kHostname, kPath);
-  http.sendHeader("Content-Length", 20);
-  http.write((const uint8_t *) "{\"temperature\":\"15\"}", 20);
+  http.sendHeader("Content-Length", content_length);
+  http.write((const uint8_t *) buf, content_length);
   http.flush();
   http.endRequest();
   
