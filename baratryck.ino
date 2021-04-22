@@ -41,11 +41,9 @@ void loop()
   char buf[100];
   int humidity = DHT.temperature;
   int temperature = DHT.humidity;
-  int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\"}", temperature, humidity);
+  int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\"}", humidity, temperature);
 
-
- 
-  
+  delay(1000);
   
   EthernetClient c;
   HttpClient http(c);
@@ -55,7 +53,7 @@ void loop()
   http.write((const uint8_t *) buf, content_length);
   http.flush();
   http.endRequest();
-    delay(2000);
+   
   if (err == 0)
   {
     Serial.println("startedRequest ok");
@@ -121,5 +119,5 @@ void loop()
   http.stop();
 
   // And just stop, now that we've tried a download
-  while(1);
+ 
 }
