@@ -9,8 +9,8 @@ dht DHT;
 #define DHT11_PIN 7
   int ledpin = 11;
   int sensorPin = A1; 
-int sensorValue = 0; // nollställer varje gång
-int sensorVCC = 13;
+  int sensorValue = 0; // nollställer varje gång
+  int sensorVCC = 13;
 
 const char kHostname[] = "84.217.9.249";
 const char kPath[] = "/data/ar";
@@ -29,7 +29,7 @@ void initSoilHumidity() {
 int getSoilHumidity() {
  digitalWrite(sensorVCC, HIGH); // spänning till sensorn
  delay(100); // kollar så sensorn är på
- int sensorValue = analogRead(sensorPin); // läser värdet
+ sensorValue = analogRead(sensorPin); // läser värdet
  digitalWrite(sensorVCC, LOW); // stannar
 
 return sensorValue;
@@ -46,6 +46,7 @@ void setup()
     Serial.println("Error getting IP address via DHCP, trying again...");
     delay(1000);
   }  
+  initSoilHumidity();
 }
 
 void loop()
@@ -56,11 +57,11 @@ void loop()
   
   char buf[100];
 
-  initSoilHumidity();
+ 
   getSoilHumidity();
   int humidity = DHT.temperature;
   int temperature = DHT.humidity;
-  int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\",\"soil humidity\":\"%d\"}", sensorValue, humidity, temperature);
+  int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\",\"soil humidity\":\"%d\"}", humidity, temperature, sensorValue);
 
   delay(1000);
   
