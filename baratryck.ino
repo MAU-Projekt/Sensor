@@ -8,6 +8,9 @@ dht DHT;
 
 #define DHT11_PIN 7
   int ledpin = 11;
+  int sensorPin = A1; 
+int sensorValue = 0; // nollställer varje gång
+int sensorVCC = 13;
 
 const char kHostname[] = "84.217.9.249";
 const char kPath[] = "/data/ar";
@@ -18,6 +21,19 @@ byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 const int kNetworkTimeout = 30*1000;
 // Number of milliseconds to wait if no data is available before trying again
 const int kNetworkDelay = 1000;
+
+void initSoilHumidity() {
+ pinMode(sensorVCC, OUTPUT);
+ digitalWrite(sensorVCC, LOW);
+}
+int getSoilHumidity() {
+ digitalWrite(sensorVCC, HIGH); // spänning till sensorn
+ delay(100); // kollar så sensorn är på
+ int sensorValue = analogRead(sensorPin); // läser värdet
+ digitalWrite(sensorVCC, LOW); // stannar
+
+return sensorValue;
+}
 
 void setup()
 {
@@ -39,9 +55,12 @@ void loop()
   int val;
   
   char buf[100];
+
+  initSoilHumidity();
+  getSoilHumidity();
   int humidity = DHT.temperature;
   int temperature = DHT.humidity;
-  int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\"}", humidity, temperature);
+  int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\",\"soil humidity\":\"%d\"}", sensorValue, humidity, temperature);
 
   delay(1000);
   
