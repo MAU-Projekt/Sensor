@@ -9,18 +9,43 @@ dht DHT;
 #define DHT11_PIN 7
   int ledpin = 11;
   int sensorPin = A1; 
-  int sensorValue = 0; // nollställer varje gång
+  int soilHumidity = 0; // nollställer varje gång
   int sensorVCC = 13;
+  byte waterPump = 6;
+  const int dry = 600;
 
 const char kHostname[] = "84.217.9.249";
 const char kPath[] = "/data/ar";
 
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte mac[] = { 0xDA, 0xED, 0xBB, 0xFF, 0xBE, 0xAC };
 
 // Number of milliseconds to wait without receiving any data before we give up
 const int kNetworkTimeout = 30*1000;
 // Number of milliseconds to wait if no data is available before trying again
 const int kNetworkDelay = 1000;
+
+void initWater() {
+ Serial.begin(9600);
+ while (!Serial);
+ pinMode(waterPump, OUTPUT); // 
+}
+
+int getWater() {
+ int soilHumidity = analogRead(sensorPin);
+ Serial.println(soilHumidity);
+ if (soilHumidity >= dry) {
+    Serial.println("Watering starts now..soil humidity is " + String(soilHumidity));
+ digitalWrite(waterPump, HIGH); // pump1 activated
+ delay(1000); //Hur länge vatten ska rinna
+ 
+ digitalWrite(waterPump, LOW); // pump1 deactivated
+ Serial.println("Done watering.");
+ }
+ else {
+    Serial.println("Soil humidity is wet enough. No water needed " + String(soilHumidity));
+  }
+ delay(5000); //Paus mellan varje vattning
+}
 
 void initSoilHumidity() {
  pinMode(sensorVCC, OUTPUT);
@@ -29,10 +54,10 @@ void initSoilHumidity() {
 int getSoilHumidity() {
  digitalWrite(sensorVCC, HIGH); // spänning till sensorn
  delay(100); // kollar så sensorn är på
- sensorValue = analogRead(sensorPin); // läser värdet
+ soilHumidity = analogRead(sensorPin); // läser värdet
  digitalWrite(sensorVCC, LOW); // stannar
 
-return sensorValue;
+return soilHumidity;
 }
 
 void setup()
@@ -47,6 +72,7 @@ void setup()
     delay(1000);
   }  
   initSoilHumidity();
+  initWater();
 }
 
 void loop()
@@ -61,9 +87,13 @@ void loop()
   getSoilHumidity();
   int humidity = DHT.temperature;
   int temperature = DHT.humidity;
-  int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\",\"soil humidity\":\"%d\"}", humidity, temperature, sensorValue);
+  getWater();
+  int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\",\"soil humidity\":\"%d\"}", humidity, temperature, soilHumidity);
 
   delay(1000);
+  
+
+  
   
   EthernetClient c;
   HttpClient http(c);
@@ -139,5 +169,4 @@ void loop()
   http.stop();
 
   // And just stop, now that we've tried a download
- 
 }
