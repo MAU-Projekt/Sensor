@@ -11,7 +11,7 @@ dht DHT;
   int sensorPin = A1; 
   int soilHumidity = 0; // nollställer varje gång
   int sensorVCC = 13;
-  byte waterPump = 6;
+  int waterPump = 5;
   const int dry = 600;
 
 const char kHostname[] = "84.217.9.249";
@@ -25,19 +25,19 @@ const int kNetworkTimeout = 30*1000;
 const int kNetworkDelay = 1000;
 
 void initWater() {
- Serial.begin(9600);
- while (!Serial);
- pinMode(waterPump, OUTPUT); // 
+ //Serial.begin(9600);
+//while (!Serial);
+ pinMode(waterPump, OUTPUT);
+ digitalWrite(waterPump, LOW);// 
 }
 
 int getWater() {
- int soilHumidity = analogRead(sensorPin);
+ soilHumidity = analogRead(sensorPin);
  Serial.println(soilHumidity);
  if (soilHumidity >= dry) {
     Serial.println("Watering starts now..soil humidity is " + String(soilHumidity));
  digitalWrite(waterPump, HIGH); // pump1 activated
- delay(1000); //Hur länge vatten ska rinna
- 
+ delay(2000); //Hur länge vatten ska rinna
  digitalWrite(waterPump, LOW); // pump1 deactivated
  Serial.println("Done watering.");
  }
@@ -87,12 +87,10 @@ void loop()
   getSoilHumidity();
   int humidity = DHT.temperature;
   int temperature = DHT.humidity;
-  getWater();
   int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\",\"soil humidity\":\"%d\"}", humidity, temperature, soilHumidity);
 
   delay(1000);
-  
-
+  getWater();
   
   
   EthernetClient c;
@@ -165,7 +163,6 @@ void loop()
     Serial.print("Connect failed: ");
     Serial.println(err);
   }
-
   http.stop();
 
   // And just stop, now that we've tried a download
