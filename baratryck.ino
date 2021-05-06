@@ -40,11 +40,12 @@ int getWater() {
  delay(2000); //Hur länge vatten ska rinna
  digitalWrite(waterPump, LOW); // pump1 deactivated
  Serial.println("Done watering.");
+ 
  }
  else {
     Serial.println("Soil humidity is wet enough. No water needed " + String(soilHumidity));
   }
- delay(5000); //Paus mellan varje vattning
+ delay(21600000); //Paus mellan varje vattning
 }
 
 void initSoilHumidity() {
@@ -83,15 +84,15 @@ void loop()
   
   char buf[100];
 
- 
+  
   getSoilHumidity();
   int humidity = DHT.temperature;
   int temperature = DHT.humidity;
   int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\",\"soil humidity\":\"%d\"}", humidity, temperature, soilHumidity);
-
-  delay(1000);
-  getWater();
   
+  delay(1000);
+ 
+  getWater();
   
   EthernetClient c;
   HttpClient http(c);
