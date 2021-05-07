@@ -11,7 +11,7 @@ dht DHT;
   int sensorPin = A1; 
   int soilHumidity = 0; // nollställer varje gång
   int sensorVCC = 13;
-  int waterPump = 5;
+  int waterPump = 6;
   const int dry = 600;
 
 const char kHostname[] = "84.217.9.249";
@@ -25,8 +25,8 @@ const int kNetworkTimeout = 30*1000;
 const int kNetworkDelay = 1000;
 
 void initWater() {
- //Serial.begin(9600);
-//while (!Serial);
+ 
+ while (!Serial);
  pinMode(waterPump, OUTPUT);
  digitalWrite(waterPump, LOW);// 
 }
@@ -37,7 +37,7 @@ int getWater() {
  if (soilHumidity >= dry) {
     Serial.println("Watering starts now..soil humidity is " + String(soilHumidity));
  digitalWrite(waterPump, HIGH); // pump1 activated
- delay(2000); //Hur länge vatten ska rinna
+ delay(1000); //Hur länge vatten ska rinna
  digitalWrite(waterPump, LOW); // pump1 deactivated
  Serial.println("Done watering.");
  
@@ -45,7 +45,8 @@ int getWater() {
  else {
     Serial.println("Soil humidity is wet enough. No water needed " + String(soilHumidity));
   }
- delay(21600000); //Paus mellan varje vattning
+  delay(30000);
+  //Paus mellan varje vattning
 }
 
 void initSoilHumidity() {
@@ -66,14 +67,14 @@ void setup()
   // initialize serial communications at 9600 bps:
   Serial.begin(9600); 
   pinMode(ledpin, OUTPUT);
+  initSoilHumidity();
+  initWater();
 
   while (Ethernet.begin(mac) != 1)
   {
     Serial.println("Error getting IP address via DHCP, trying again...");
     delay(1000);
   }  
-  initSoilHumidity();
-  initWater();
 }
 
 void loop()
@@ -91,8 +92,6 @@ void loop()
   int content_length = sprintf(buf, "{\"temperature\":\"%d\",\"humidity\":\"%d\",\"soil humidity\":\"%d\"}", humidity, temperature, soilHumidity);
   
   delay(1000);
- 
-  getWater();
   
   EthernetClient c;
   HttpClient http(c);
@@ -164,7 +163,11 @@ void loop()
     Serial.print("Connect failed: ");
     Serial.println(err);
   }
+  
+  getWater();
+  
   http.stop();
+ 
 
   // And just stop, now that we've tried a download
 }
