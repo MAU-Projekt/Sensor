@@ -15,7 +15,7 @@ dht DHT;
   const int dry = 600;
 
 const char kHostname[] = "84.217.9.249";
-const char kPath[] = "/data/ar";
+const char kPath[] = "/data/00000001a033f6d3";
 
 byte mac[] = { 0xDA, 0xED, 0xBB, 0xFF, 0xBE, 0xAC };
 
